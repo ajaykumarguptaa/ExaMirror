@@ -51,7 +51,7 @@ const Navbar = () => {
               <Link to="/" className="flex items-center">
               
                 <span className="text-2xl font-bold text-blue-600">
-                  <img src="\src\assets\images\Em.png" width="160px" alt="" />
+                  <img src="\src\assets\images\Em.png" width="200px" alt="" />
                 </span>
               </Link>
             </div>

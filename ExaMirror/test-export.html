@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Export Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .csv-preview {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>CSV Export Test</h1>
+    <p>This page tests the CSV export functionality that will be used in the admin dashboard.</p>
+
+    <div class="test-section">
+        <h3>Test Data</h3>
+        <button onclick="testUserExport()">Export Users</button>
+        <button onclick="testCourseExport()">Export Courses</button>
+        <button onclick="testTestExport()">Export Tests</button>
+        <button onclick="testDashboardExport()">Export Dashboard Stats</button>
+        <div id="csvOutput" class="csv-preview"></div>
+    </div>
+
+    <script>
+        // Sample data for testing
+        const sampleUsers = [
+            { Name: 'John Doe', Email: 'john@example.com', Role: 'student', Status: 'active', 'Join Date': '2024-01-15' },
+            { Name: 'Jane Smith', Email: 'jane@example.com', Role: 'instructor', Status: 'active', 'Join Date': '2024-01-14' },
+            { Name: 'Admin User', Email: 'admin@example.com', Role: 'admin', Status: 'active', 'Join Date': '2024-01-10' }
+        ];
+
+        const sampleCourses = [
+            { Title: 'Advanced Mathematics', Description: 'Advanced math course', Instructor: 'Dr. Sarah Johnson', Category: 'Mathematics', Level: 'advanced', Price: 99.99, Status: 'published', 'Enrolled Students': 1247, 'Created Date': '2024-01-15' },
+            { Title: 'Physics Fundamentals', Description: 'Basic physics course', Instructor: 'Prof. Michael Chen', Category: 'Science', Level: 'beginner', Price: 79.99, Status: 'published', 'Enrolled Students': 892, 'Created Date': '2024-01-14' }
+        ];
+
+        const sampleTests = [
+            { Title: 'Math Quiz 1', Description: 'Basic math test', Course: 'Advanced Mathematics', Duration: '60 minutes', 'Passing Score': '70%', Status: 'published', 'Question Count': 25, 'Created Date': '2024-01-15' },
+            { Title: 'Physics Test', Description: 'Physics fundamentals test', Course: 'Physics Fundamentals', Duration: '45 minutes', 'Passing Score': '75%', Status: 'draft', 'Question Count': 20, 'Created Date': '2024-01-14' }
+        ];
+
+        const sampleDashboard = [
+            { Metric: 'Total Users', Value: 1247, Date: new Date().toLocaleDateString() },
+            { Metric: 'Total Courses', Value: 156, Date: new Date().toLocaleDateString() },
+            { Metric: 'Total Tests', Value: 89, Date: new Date().toLocaleDateString() },
+            { Metric: 'Total Enrollments', Value: 8934, Date: new Date().toLocaleDateString() }
+        ];
+
+        // Convert data to CSV
+        function convertToCSV(data) {
+            if (data.length === 0) return '';
+            
+            const headers = Object.keys(data[0]);
+            const csvRows = [
+                headers.join(','),
+                ...data.map(row => 
+                    headers.map(header => {
+                        const value = row[header];
+                        // Escape commas and quotes in CSV
+                        if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+                            return `"${value.replace(/"/g, '""')}"`;
+                        }
+                        return value;
+                    }).join(',')
+                )
+            ];
+            
+            return csvRows.join('\n');
+        }
+
+        // Download CSV file
+        function downloadCSV(csvContent, filename) {
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Test functions
+        function testUserExport() {
+            const csv = convertToCSV(sampleUsers);
+            document.getElementById('csvOutput').textContent = csv;
+            downloadCSV(csv, 'users-export.csv');
+        }
+
+        function testCourseExport() {
+            const csv = convertToCSV(sampleCourses);
+            document.getElementById('csvOutput').textContent = csv;
+            downloadCSV(csv, 'courses-export.csv');
+        }
+
+        function testTestExport() {
+            const csv = convertToCSV(sampleTests);
+            document.getElementById('csvOutput').textContent = csv;
+            downloadCSV(csv, 'tests-export.csv');
+        }
+
+        function testDashboardExport() {
+            const csv = convertToCSV(sampleDashboard);
+            document.getElementById('csvOutput').textContent = csv;
+            downloadCSV(csv, 'dashboard-stats.csv');
+        }
+
+        // Auto-run one test on page load
+        window.onload = function() {
+            console.log('Export test page loaded. Click buttons to test CSV export functionality.');
+        };
+    </script>
+</body>
+</html> 

@@ -5,6 +5,7 @@ import ProtectedRoute from '../components/ProtectedRoute';
 import AdminLogin from '../pages/AdminLogin';
 import AdminDashboard from '../pages/AdminDashboard';
 import AdminUsers from '../pages/AdminUsers';
+import AdminCourses from '../pages/AdminCourses';
 
 const AdminRoutes = () => {
   return (
@@ -21,7 +22,7 @@ const AdminRoutes = () => {
               <Routes>
                 <Route path="/" element={<AdminDashboard />} />
                 <Route path="/users" element={<AdminUsers />} />
-                <Route path="/courses" element={<div className="p-8">Courses Management - Coming Soon</div>} />
+                <Route path="/courses" element={<AdminCourses />} />
                 <Route path="/materials" element={<div className="p-8">Study Materials Management - Coming Soon</div>} />
                 <Route path="/tests" element={<div className="p-8">Tests & Quizzes Management - Coming Soon</div>} />
                 <Route path="/analytics" element={<div className="p-8">Analytics - Coming Soon</div>} />

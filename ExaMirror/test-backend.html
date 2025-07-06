@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin-top: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .loading {
+            color: #007bff;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>Backend API Test</h1>
+    <p>This page tests if the backend API is working correctly.</p>
+
+    <div class="test-section">
+        <h3>Backend Status</h3>
+        <button onclick="testHealth()">Test Health Endpoint</button>
+        <button onclick="testAllEndpoints()">Test All Endpoints</button>
+        <div id="healthResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Admin API Tests</h3>
+        <button onclick="testAdminUsers()">Test Admin Users API</button>
+        <button onclick="testAdminDashboard()">Test Admin Dashboard API</button>
+        <button onclick="testAdminCourses()">Test Admin Courses API</button>
+        <div id="adminResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Authentication Test</h3>
+        <button onclick="testAuth()">Test Authentication</button>
+        <div id="authResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Connection Info</h3>
+        <div id="connectionInfo" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api';
+        
+        // Display connection info
+        document.getElementById('connectionInfo').textContent = 
+            `API Base URL: ${API_BASE_URL}\n` +
+            `Current Time: ${new Date().toLocaleString()}\n` +
+            `User Agent: ${navigator.userAgent}`;
+
+        async function makeRequest(endpoint, options = {}) {
+            const url = `${API_BASE_URL}${endpoint}`;
+            const config = {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                ...options,
+            };
+
+            try {
+                const response = await fetch(url, config);
+                const data = await response.json();
+                
+                return {
+                    success: response.ok,
+                    status: response.status,
+                    statusText: response.statusText,
+                    data: data,
+                    url: url
+                };
+            } catch (error) {
+                return {
+                    success: false,
+                    error: error.message,
+                    url: url
+                };
+            }
+        }
+
+        function displayResult(elementId, result, title) {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            
+            let content = `[${timestamp}] ${title}\n`;
+            content += `URL: ${result.url}\n`;
+            
+            if (result.success) {
+                content += `Status: ${result.status} ${result.statusText}\n`;
+                content += `Response: ${JSON.stringify(result.data, null, 2)}\n`;
+                element.className = 'result success';
+            } else {
+                content += `Error: ${result.error || result.statusText}\n`;
+                if (result.data) {
+                    content += `Response: ${JSON.stringify(result.data, null, 2)}\n`;
+                }
+                element.className = 'result error';
+            }
+            
+            element.textContent = content;
+        }
+
+        async function testHealth() {
+            const element = document.getElementById('healthResult');
+            element.textContent = 'Testing health endpoint...';
+            element.className = 'result loading';
+            
+            const result = await makeRequest('/health');
+            displayResult('healthResult', result, 'Health Check');
+        }
+
+        async function testAdminUsers() {
+            const element = document.getElementById('adminResult');
+            element.textContent = 'Testing admin users endpoint...';
+            element.className = 'result loading';
+            
+            const result = await makeRequest('/admin/users');
+            displayResult('adminResult', result, 'Admin Users API');
+        }
+
+        async function testAdminDashboard() {
+            const element = document.getElementById('adminResult');
+            element.textContent = 'Testing admin dashboard endpoint...';
+            element.className = 'result loading';
+            
+            const result = await makeRequest('/admin/dashboard');
+            displayResult('adminResult', result, 'Admin Dashboard API');
+        }
+
+        async function testAdminCourses() {
+            const element = document.getElementById('adminResult');
+            element.textContent = 'Testing admin courses endpoint...';
+            element.className = 'result loading';
+            
+            const result = await makeRequest('/admin/courses');
+            displayResult('adminResult', result, 'Admin Courses API');
+        }
+
+        async function testAuth() {
+            const element = document.getElementById('authResult');
+            element.textContent = 'Testing authentication...';
+            element.className = 'result loading';
+            
+            // Test without token
+            const result = await makeRequest('/auth/me');
+            displayResult('authResult', result, 'Authentication Test (No Token)');
+        }
+
+        async function testAllEndpoints() {
+            const endpoints = [
+                '/health',
+                '/admin/users',
+                '/admin/dashboard',
+                '/admin/courses',
+                '/auth/me'
+            ];
+
+            const element = document.getElementById('healthResult');
+            element.textContent = 'Testing all endpoints...';
+            element.className = 'result loading';
+
+            let results = [];
+            for (const endpoint of endpoints) {
+                const result = await makeRequest(endpoint);
+                results.push({ endpoint, ...result });
+            }
+
+            let content = `[${new Date().toLocaleTimeString()}] All Endpoints Test\n\n`;
+            results.forEach(result => {
+                content += `Endpoint: ${result.endpoint}\n`;
+                content += `Status: ${result.success ? 'SUCCESS' : 'FAILED'}\n`;
+                if (result.status) {
+                    content += `HTTP: ${result.status} ${result.statusText}\n`;
+                }
+                if (result.error) {
+                    content += `Error: ${result.error}\n`;
+                }
+                content += '\n';
+            });
+
+            element.textContent = content;
+            element.className = 'result ' + (results.every(r => r.success) ? 'success' : 'error');
+        }
+
+        // Auto-run health check on page load
+        window.onload = function() {
+            console.log('Backend test page loaded. Click buttons to test API endpoints.');
+            // Auto-test health endpoint
+            setTimeout(testHealth, 1000);
+        };
+    </script>
+</body>
+</html> 
